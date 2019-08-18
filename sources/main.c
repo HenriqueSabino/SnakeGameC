@@ -1,4 +1,5 @@
 #include <allegro.h>
+#include "../headers/vector.h"
 
 volatile int exit_game = FALSE;
 
@@ -23,7 +24,9 @@ int main()
 
 	//Double buffer
 	BITMAP *buffer = create_bitmap(SCREEN_W, SCREEN_H);
-	int x = 0;
+	struct vector pos;
+	pos.x = 0;
+	pos.y = SCREEN_H / 2;
 
 	while (!exit_game)
 	{
@@ -34,11 +37,11 @@ int main()
 		}
 
 		//Variable updates
-		x++;
+		pos.x++;
 
 		//Drawing
 		//slowing the circle velocity
-		circlefill(buffer, x / 10, SCREEN_H / 2, 50, makecol(255, 0, 0));
+		circlefill(buffer, pos.x / 10, pos.y, 50, makecol(255, 0, 0));
 
 		draw_sprite(screen, buffer, 0, 0);
 		clear(buffer);
