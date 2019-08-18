@@ -1,0 +1,1 @@
+#define PIXEL_SIZE 10
