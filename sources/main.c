@@ -21,14 +21,27 @@ int main()
 	LOCK_FUNCTION(close_program);
 	set_close_button_callback(close_game);
 
+	//Double buffer
+	BITMAP *buffer = create_bitmap(SCREEN_W, SCREEN_H);
+	int x = 0;
+
 	while (!exit_game)
 	{
+		//User input
 		if (key[KEY_ESC])
 		{
 			close_game();
 		}
 
-		textout_centre_ex(screen, font, "Hello snake game!", SCREEN_W / 2, SCREEN_H / 2, makecol(255, 255, 255), -1);
+		//Variable updates
+		x++;
+
+		//Drawing
+		//slowing the circle velocity
+		circlefill(buffer, x / 10, SCREEN_H / 2, 50, makecol(255, 0, 0));
+
+		draw_sprite(screen, buffer, 0, 0);
+		clear(buffer);
 	}
 
 	return 0;
