@@ -6,4 +6,4 @@ To build this project you will need the MinGW compiler and the Allegro 4.4.2 lib
 
 # Building
 To make a build of this project open a comand prompt in the source folder and type the following commad:<br>
-  gcc -L\<your MinGW installation folder here\>/bin/ -g \<all of the .c files in the folder separated by spaces\> -o snake.exe -lallegro-4.4.2-monolith-md-debug -lallegro-4.4.2-monolith-md
+  gcc -L\<your MinGW installation folder here\>/bin/ -g \<all of the .c files in the folder separated by spaces\> -o ../build/snake.exe -lallegro-4.4.2-monolith-md-debug -lallegro-4.4.2-monolith-md<br>Go to the project folder and there should be a build folder created with the executable inside
