@@ -1,7 +1,7 @@
 # SnakeGameC
 The classic snake game made with Allegro in C
 
-# to build
+# Steps to build
 To build this project you will need the MinGW compiler and the Allegro 4.4.2 library to your PC. To download the MinGW go to https://sourceforge.net/projects/mingw-w64/ and click the green download button. To download the Allegro library go to https://www.allegro.cc/files/?v=4.4 and choose the version that is compatible with your MinGW
 
 # Building
