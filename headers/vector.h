@@ -7,4 +7,9 @@ typedef struct vector
     float y;
 } Vector;
 
+const Vector UP;
+const Vector DOWN;
+const Vector LEFT;
+const Vector RIGHT;
+
 #endif

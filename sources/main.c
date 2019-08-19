@@ -5,12 +5,21 @@
 #include "../headers/constants.h"
 
 volatile int exit_game = FALSE;
+volatile long counter = 0;
 
 void close_game()
 {
 	exit_game = TRUE;
 }
 END_OF_FUNCTION(close_game);
+
+void increment()
+{
+	counter++;
+}
+END_OF_FUNCTION(increment);
+
+void draw_snake(BITMAP *buffer, Snake snake);
 
 int main()
 {
@@ -25,64 +34,49 @@ int main()
 	LOCK_FUNCTION(close_program);
 	set_close_button_callback(close_game);
 
+	LOCK_VARIABLE(counter);
+	LOCK_FUNCTION(increment);
+	install_int_ex(increment, BPS_TO_TIMER(15));
+
 	//Double buffer
 	BITMAP *buffer = create_bitmap(SCREEN_W, SCREEN_H);
 
 	Snake snake;
 	init_snake(&snake, 4, SCREEN_W / 2, SCREEN_H / 2);
 
-	for (int i = 0; i < snake.parts_size; i++)
-	{
-		printf("%f, %f\n", snake.parts[i].x, snake.parts[i].y);
-	}
-	printf("\n");
-
-	update_snake(&snake);
-	for (int i = 0; i < snake.parts_size; i++)
-	{
-		printf("%f, %f\n", snake.parts[i].x, snake.parts[i].y);
-	}
-
-	printf("\n");
-
-	Vector newDir;
-	newDir.x = 0;
-	newDir.y = -1;
-
-	printf("%f, %f\n", snake.dir.x, snake.dir.y);
-	change_dir(&snake, newDir);
-	printf("%f, %f\n", snake.dir.x, snake.dir.y);
-
-	printf("\n");
-
-	grow(&snake);
-
-	for (int i = 0; i < snake.parts_size; i++)
-	{
-		printf("%f, %f\n", snake.parts[i].x, snake.parts[i].y);
-	}
-
-	update_snake(&snake);
-
-	printf("\n");
-	for (int i = 0; i < snake.parts_size; i++)
-	{
-		printf("%f, %f\n", snake.parts[i].x, snake.parts[i].y);
-	}
-
 	while (!exit_game)
 	{
-		//User input
-		if (key[KEY_ESC])
+		while (counter > 0)
 		{
-			close_game();
+			//User input
+			if (key[KEY_ESC])
+			{
+				close_game();
+			}
+			if (key[KEY_W])
+			{
+				change_dir(&snake, UP);
+			}
+			else if (key[KEY_A])
+			{
+				change_dir(&snake, LEFT);
+			}
+			else if (key[KEY_S])
+			{
+				change_dir(&snake, DOWN);
+			}
+			else if (key[KEY_D])
+			{
+				change_dir(&snake, RIGHT);
+			}
+
+			//Variable updates
+			update_snake(&snake);
+			counter--;
 		}
-
-		//Variable updates
-
 		//Drawing
-		//slowing the circle velocity
 
+		draw_snake(buffer, snake);
 		draw_sprite(screen, buffer, 0, 0);
 		clear(buffer);
 	}
@@ -90,3 +84,14 @@ int main()
 	return 0;
 }
 END_OF_MAIN();
+
+void draw_snake(BITMAP *buffer, Snake snake)
+{
+	for (int i = 0; i < snake.parts_size; i++)
+	{
+		rectfill(buffer, snake.parts[i].x, snake.parts[i].y,
+				 snake.parts[i].x + PIXEL_SIZE, snake.parts[i].y + PIXEL_SIZE, makecol(255, 255, 255));
+		rect(buffer, snake.parts[i].x, snake.parts[i].y,
+			 snake.parts[i].x + PIXEL_SIZE, snake.parts[i].y + PIXEL_SIZE, makecol(0, 0, 0));
+	}
+}
