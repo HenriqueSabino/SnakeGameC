@@ -51,7 +51,7 @@ void check_food_eaten(Food *food, Snake *snake, Vector min_pos, Vector max_pos)
         int successful = init_food(food, snake, min_pos, max_pos);
         while (!successful)
         {
-            init_food(food, snake, min_pos, max_pos);
+            successful = init_food(food, snake, min_pos, max_pos);
         }
     }
 }
