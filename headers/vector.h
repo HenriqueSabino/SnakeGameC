@@ -7,6 +7,7 @@ typedef struct vector
     float y;
 } Vector;
 
+Vector create_vector(float, float);
 const Vector UP;
 const Vector DOWN;
 const Vector LEFT;

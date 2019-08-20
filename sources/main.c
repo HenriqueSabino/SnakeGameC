@@ -3,6 +3,7 @@
 #include "../headers/vector.h"
 #include "../headers/snake.h"
 #include "../headers/constants.h"
+#include "../headers/food.h"
 
 volatile int exit_game = FALSE;
 volatile long counter = 0;
@@ -20,7 +21,8 @@ void increment()
 }
 END_OF_FUNCTION(increment);
 
-void draw_snake(BITMAP *buffer, Snake snake);
+void draw_snake(BITMAP *bitmap, Snake snake);
+void draw_food(BITMAP *bitmap, Food food);
 
 int main()
 {
@@ -46,6 +48,15 @@ int main()
 
 	Snake snake;
 	init_snake(&snake, INITIAL_SIZE, SCREEN_W / 2, SCREEN_H / 2);
+
+	Food food;
+
+	int successful = init_food(&food, &snake, create_vector(0, 0), create_vector(SCREEN_W, SCREEN_H));
+	//while it was not successful initializing the food, keep trying
+	while (!successful)
+	{
+		successful = init_food(&food, &snake, create_vector(0, 0), create_vector(SCREEN_W, SCREEN_H));
+	}
 
 	while (!exit_game)
 	{
@@ -78,19 +89,30 @@ int main()
 			update_snake(&snake);
 
 			//checking if the passed the boarders or bumped into its tail
-			int dead = check_death(&snake, (Vector){.x = 0, .y = 0}, (Vector){.x = SCREEN_W, .y = SCREEN_H});
+			int dead = check_death(&snake, create_vector(0, 0), create_vector(SCREEN_W, SCREEN_H));
 
 			if (dead)
 			{
 				init_snake(&snake, INITIAL_SIZE, SCREEN_W / 2, SCREEN_H / 2);
-			}
+				int successful = init_food(&food, &snake, create_vector(0, 0), create_vector(SCREEN_W, SCREEN_H));
 
+				//while it was not successful initializing the food, keep trying
+				while (!successful)
+				{
+					successful = init_food(&food, &snake, create_vector(0, 0), create_vector(SCREEN_W, SCREEN_H));
+				}
+			}
+			else
+			{
+				check_food_eaten(&food, &snake, create_vector(0, 0), create_vector(SCREEN_W, SCREEN_H));
+			}
 			//resetting the counter to zero
 			counter--;
 		}
 		//Drawing
 
 		draw_snake(buffer, snake);
+		draw_food(buffer, food);
 		draw_sprite(screen, buffer, 0, 0);
 		clear(buffer);
 	}
@@ -102,13 +124,21 @@ int main()
 }
 END_OF_MAIN();
 
-void draw_snake(BITMAP *buffer, Snake snake)
+void draw_snake(BITMAP *bitmap, Snake snake)
 {
 	for (int i = 0; i < snake.parts_size; i++)
 	{
-		rectfill(buffer, snake.parts[i].x, snake.parts[i].y,
+		rectfill(bitmap, snake.parts[i].x, snake.parts[i].y,
 				 snake.parts[i].x + PIXEL_SIZE, snake.parts[i].y + PIXEL_SIZE, makecol(255, 255, 255));
-		rect(buffer, snake.parts[i].x, snake.parts[i].y,
+		rect(bitmap, snake.parts[i].x, snake.parts[i].y,
 			 snake.parts[i].x + PIXEL_SIZE, snake.parts[i].y + PIXEL_SIZE, makecol(0, 0, 0));
 	}
+}
+
+void draw_food(BITMAP *bitmap, Food food)
+{
+	rectfill(bitmap, food.pos.x, food.pos.y,
+			 food.pos.x + PIXEL_SIZE, food.pos.y + PIXEL_SIZE, makecol(255, 0, 0));
+	rect(bitmap, food.pos.x, food.pos.y,
+		 food.pos.x + PIXEL_SIZE, food.pos.y + PIXEL_SIZE, makecol(0, 0, 0));
 }
