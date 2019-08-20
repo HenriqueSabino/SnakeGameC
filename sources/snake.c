@@ -62,3 +62,21 @@ void grow(Snake *snake)
     //setting the added part to be at the head position, this will be changed in the next update_snake
     snake->parts[snake->parts_size - 1] = snake->parts[0];
 }
+
+int check_death(Snake *snake, Vector min_point, Vector max_point)
+{
+    Vector head = snake->parts[0];
+
+    if ((head.x < min_point.x || head.x >= max_point.x) || (head.y < min_point.y || head.y >= max_point.y))
+    {
+        return 1;
+    }
+
+    for (int i = 1; i < snake->parts_size; i++)
+    {
+        if (head.x == snake->parts[i].x && head.y == snake->parts[i].y)
+            return 1;
+    }
+
+    return 0;
+}

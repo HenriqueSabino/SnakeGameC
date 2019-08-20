@@ -14,6 +14,6 @@ void init_snake(Snake *, int, int, int);
 void update_snake(Snake *);
 void change_dir(Snake *, Vector);
 void grow(Snake *);
-void check_death(Snake *, Vector, Vector);
+int check_death(Snake *, Vector, Vector);
 
 #endif
