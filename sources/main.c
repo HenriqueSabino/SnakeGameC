@@ -30,7 +30,7 @@ int main()
 	install_timer();
 	install_keyboard();
 	set_color_depth(32);
-	set_gfx_mode(GFX_AUTODETECT_WINDOWED, 600, 400, 0, 0);
+	set_gfx_mode(GFX_AUTODETECT_WINDOWED, 600, 500, 0, 0);
 
 	//Attaching a function to the exit button
 	LOCK_VARIABLE(exit_program);
@@ -49,17 +49,32 @@ int main()
 	Snake snake;
 	init_snake(&snake, INITIAL_SIZE, SCREEN_W / 2, SCREEN_H / 2);
 
+	//the player's score
+	int player_score = 0;
+	int game_paused = TRUE;
+
 	Food food;
 
-	int successful = init_food(&food, &snake, create_vector(0, 0), create_vector(SCREEN_W, SCREEN_H));
+	int successful = init_food(&food, &snake, create_vector(0, 100), create_vector(SCREEN_W, SCREEN_H));
 	//while it was not successful initializing the food, keep trying
 	while (!successful)
 	{
-		successful = init_food(&food, &snake, create_vector(0, 0), create_vector(SCREEN_W, SCREEN_H));
+		successful = init_food(&food, &snake, create_vector(0, 100), create_vector(SCREEN_W, SCREEN_H));
 	}
 
 	while (!exit_game)
 	{
+
+		clear_to_color(buffer, makecol(BG_COL, BG_COL, BG_COL));
+		rectfill(buffer, 0, 0, SCREEN_W, 100, makecol(BG_COL + 20, BG_COL + 20, BG_COL + 20));
+		char text[15];
+
+		//Text outputs
+		snprintf(text, 15, "Score: %d", player_score);
+		textout_ex(buffer, font, text, 0, 0, makecol(255, 255, 255), -1);
+
+		textout_right_ex(buffer, font, "Press P to pause/unpause", SCREEN_W, 0, makecol(255, 255, 255), -1);
+
 		//checking if the counter was incremented to update the game status
 		while (counter > 0)
 		{
@@ -68,43 +83,51 @@ int main()
 			{
 				close_game();
 			}
-			if (key[KEY_W] || key[KEY_UP])
+			if (key[KEY_P])
 			{
-				change_dir(&snake, UP);
+				game_paused = !game_paused;
 			}
-			else if (key[KEY_A] || key[KEY_LEFT])
+			if (!game_paused)
 			{
-				change_dir(&snake, LEFT);
-			}
-			else if (key[KEY_S] || key[KEY_DOWN])
-			{
-				change_dir(&snake, DOWN);
-			}
-			else if (key[KEY_D] || key[KEY_RIGHT])
-			{
-				change_dir(&snake, RIGHT);
-			}
-
-			//Variable updates
-			update_snake(&snake);
-
-			//checking if the passed the boarders or bumped into its tail
-			int dead = check_death(&snake, create_vector(0, 0), create_vector(SCREEN_W, SCREEN_H));
-
-			if (dead)
-			{
-				init_snake(&snake, INITIAL_SIZE, SCREEN_W / 2, SCREEN_H / 2);
-				int successful = init_food(&food, &snake, create_vector(0, 0), create_vector(SCREEN_W, SCREEN_H));
-
-				//while it was not successful initializing the food, keep trying
-				while (!successful)
+				if (key[KEY_W] || key[KEY_UP])
 				{
-					successful = init_food(&food, &snake, create_vector(0, 0), create_vector(SCREEN_W, SCREEN_H));
+					change_dir(&snake, UP);
 				}
-			}
-			else
-			{
-				check_food_eaten(&food, &snake, create_vector(0, 0), create_vector(SCREEN_W, SCREEN_H));
+				else if (key[KEY_A] || key[KEY_LEFT])
+				{
+					change_dir(&snake, LEFT);
+				}
+				else if (key[KEY_S] || key[KEY_DOWN])
+				{
+					change_dir(&snake, DOWN);
+				}
+				else if (key[KEY_D] || key[KEY_RIGHT])
+				{
+					change_dir(&snake, RIGHT);
+				}
+
+				//Variable updates
+				update_snake(&snake);
+
+				//checking if the passed the boarders or bumped into its tail
+				int dead = check_death(&snake, create_vector(0, 100), create_vector(SCREEN_W, SCREEN_H));
+
+				if (dead)
+				{
+					init_snake(&snake, INITIAL_SIZE, SCREEN_W / 2, SCREEN_H / 2);
+					int successful = init_food(&food, &snake, create_vector(0, 100), create_vector(SCREEN_W, SCREEN_H));
+
+					//while it was not successful initializing the food, keep trying
+					while (!successful)
+					{
+						successful = init_food(&food, &snake, create_vector(0, 100), create_vector(SCREEN_W, SCREEN_H));
+					}
+				}
+				else
+				{
+					check_food_eaten(&food, &snake, create_vector(0, 100), create_vector(SCREEN_W, SCREEN_H));
+					player_score = snake.parts_size - INITIAL_SIZE;
+				}
 			}
 			//resetting the counter to zero
 			counter--;
@@ -114,7 +137,6 @@ int main()
 		draw_snake(buffer, snake);
 		draw_food(buffer, food);
 		draw_sprite(screen, buffer, 0, 0);
-		clear(buffer);
 	}
 
 	destroy_bitmap(buffer);
@@ -131,7 +153,7 @@ void draw_snake(BITMAP *bitmap, Snake snake)
 		rectfill(bitmap, snake.parts[i].x, snake.parts[i].y,
 				 snake.parts[i].x + PIXEL_SIZE, snake.parts[i].y + PIXEL_SIZE, makecol(255, 255, 255));
 		rect(bitmap, snake.parts[i].x, snake.parts[i].y,
-			 snake.parts[i].x + PIXEL_SIZE, snake.parts[i].y + PIXEL_SIZE, makecol(0, 0, 0));
+			 snake.parts[i].x + PIXEL_SIZE, snake.parts[i].y + PIXEL_SIZE, makecol(BG_COL, BG_COL, BG_COL));
 	}
 }
 
@@ -140,5 +162,5 @@ void draw_food(BITMAP *bitmap, Food food)
 	rectfill(bitmap, food.pos.x, food.pos.y,
 			 food.pos.x + PIXEL_SIZE, food.pos.y + PIXEL_SIZE, makecol(255, 0, 0));
 	rect(bitmap, food.pos.x, food.pos.y,
-		 food.pos.x + PIXEL_SIZE, food.pos.y + PIXEL_SIZE, makecol(0, 0, 0));
+		 food.pos.x + PIXEL_SIZE, food.pos.y + PIXEL_SIZE, makecol(BG_COL, BG_COL, BG_COL));
 }

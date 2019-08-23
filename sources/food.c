@@ -19,9 +19,11 @@ int init_food(Food *food, Snake *snake, Vector min_pos, Vector max_pos)
     //picking a random number ranging from [0, width)
     int new_x = rand() % width;
     new_x *= PIXEL_SIZE;
+    new_x += min_pos.x;
     //picking a random number ranging from [0, height)
     int new_y = rand() % height;
     new_y *= PIXEL_SIZE;
+    new_y += min_pos.y;
 
     for (int i = 0; i < snake->parts_size; i++)
     {
