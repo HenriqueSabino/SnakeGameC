@@ -33,12 +33,21 @@ void update_snake(Snake *snake)
     snake->parts[0].y += snake->dir.y * PIXEL_SIZE;
 }
 
-void change_dir(Snake *snake, Vector new_dir)
+void change_dir(Snake *snake)
+{
+    //if the new direction is not the current direction reversed
+    if ((snake->next_dir.x != 0 && snake->dir.x != -snake->next_dir.x) || (snake->next_dir.y != 0 && snake->dir.y != -snake->next_dir.y))
+    {
+        snake->dir = snake->next_dir;
+    }
+}
+
+void change_next_dir(Snake *snake, Vector new_dir)
 {
     //if the new direction is not the current direction reversed
     if ((new_dir.x != 0 && snake->dir.x != -new_dir.x) || (new_dir.y != 0 && snake->dir.y != -new_dir.y))
     {
-        snake->dir = new_dir;
+        snake->next_dir = new_dir;
     }
 }
 

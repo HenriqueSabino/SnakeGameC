@@ -4,6 +4,7 @@
 #include "../headers/snake.h"
 #include "../headers/constants.h"
 #include "../headers/food.h"
+#include "../headers/keyboard.h"
 
 volatile int exit_game = FALSE;
 volatile long counter = 0;
@@ -74,36 +75,48 @@ int main()
 		textout_ex(buffer, font, text, 0, 0, makecol(255, 255, 255), -1);
 
 		textout_right_ex(buffer, font, "Press P to pause/unpause", SCREEN_W, 0, makecol(255, 255, 255), -1);
+		keyboard_input();
+
+		//User input
+		if (key_down(KEY_ESC))
+		{
+			close_game();
+		}
+		if (key_down(KEY_P))
+		{
+			game_paused = !game_paused;
+		}
+
+		if (!game_paused)
+		{
+
+			if (key_down(KEY_W) || key_down(KEY_UP))
+			{
+				change_next_dir(&snake, UP);
+			}
+			else if (key_down(KEY_A) || key_down(KEY_LEFT))
+			{
+				change_next_dir(&snake, LEFT);
+			}
+			else if (key_down(KEY_S) || key_down(KEY_DOWN))
+			{
+				change_next_dir(&snake, DOWN);
+			}
+			else if (key_down(KEY_D) || key_down(KEY_RIGHT))
+			{
+				change_next_dir(&snake, RIGHT);
+			}
+		}
 
 		//checking if the counter was incremented to update the game status
 		while (counter > 0)
 		{
-			//User input
-			if (key[KEY_ESC])
-			{
-				close_game();
-			}
-			if (key[KEY_P])
-			{
-				game_paused = !game_paused;
-			}
 			if (!game_paused)
 			{
-				if (key[KEY_W] || key[KEY_UP])
+
+				if (snake.next_dir.x != snake.dir.x && snake.next_dir.y != snake.dir.y)
 				{
-					change_dir(&snake, UP);
-				}
-				else if (key[KEY_A] || key[KEY_LEFT])
-				{
-					change_dir(&snake, LEFT);
-				}
-				else if (key[KEY_S] || key[KEY_DOWN])
-				{
-					change_dir(&snake, DOWN);
-				}
-				else if (key[KEY_D] || key[KEY_RIGHT])
-				{
-					change_dir(&snake, RIGHT);
+					change_dir(&snake);
 				}
 
 				//Variable updates
